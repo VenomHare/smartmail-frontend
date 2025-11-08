@@ -1,12 +1,12 @@
 
+import { useStatusPolling } from "@/components/hooks/use-status-polling";
 import LLMQuestionnaire from "@/components/mail/llm-questionnaire";
 import { MailNotFound, RequestInQueue, RequestProcessing } from "@/components/mail/screens";
 import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import type { ChatMessage, MailResponse } from "@/lib/types";
-import { DummyMail } from "@/lib/utils";
-import { Copy, MailPlus, Percent, Send } from "lucide-react";
+import type { ChatMessage } from "@/lib/types";
+import { Copy, MailPlus, Send } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
@@ -29,18 +29,8 @@ const EmailUUID = () => {
         return (<MailNotFound />)
     }
 
-
-
-    const [llmResponse, setLlmResponse] = useState<MailResponse>({
-        uuid,
-        status: "processed",
-        response: {
-            type: "mail",
-            llmMessage: "asdsadas",
-            html: DummyMail,
-            subject: "ABC inc"
-        }
-    });
+    const [loading, setLoading] = useState(false);
+    const { llmResponse, sendExtraAnswers } = useStatusPolling(uuid, setLoading);
 
     const [chats, setChats] = useState<ChatMessage[]>([{
         role: "assistant",
@@ -58,7 +48,6 @@ const EmailUUID = () => {
         })
     }
 
-
     if (llmResponse.status == "inqueue") {
         return (<RequestInQueue />)
     }
@@ -68,7 +57,7 @@ const EmailUUID = () => {
     }
 
     if (llmResponse.status == "processed" && llmResponse.response.type == "questions") {
-        return (<LLMQuestionnaire questions={llmResponse.response.questions} />)
+        return (<LLMQuestionnaire questions={llmResponse.response.questions} handleSubmit={sendExtraAnswers} loading={loading} />)
     }
 
     if (llmResponse.status == "processed" && llmResponse.response.type == "mail") {
@@ -108,15 +97,15 @@ const AIChatSection = ({ chats, sendMessage }: ChatSectionProps) => {
             <div className="w-full h-[10dvh] shadow border bg-background flex items-center justify-evenly">
                 <Button size={"lg"} variant={"ghost"} className="flex flex-col h-fit py-2">
                     <Send />
-                    Send to Gmail    
+                    Send to Gmail
                 </Button>
                 <Button size={"lg"} variant={"ghost"} className="flex flex-col h-fit py-2">
                     <Copy />
-                    Copy to Clipboard    
+                    Copy to Clipboard
                 </Button>
                 <Button size={"lg"} variant={"ghost"} className="flex flex-col h-fit py-2">
                     <MailPlus />
-                    Create New Mail    
+                    Create New Mail
                 </Button>
             </div>
             <div className="w-full h-[70dvh] shadow border p-2 flex flex-col justify-between items-center overflow-clip bg-background">
@@ -136,7 +125,7 @@ const AIChatSection = ({ chats, sendMessage }: ChatSectionProps) => {
                         })
                     }
                 </div>
-                <form onSubmit={ async (e) => {
+                <form onSubmit={async (e) => {
                     e.preventDefault();
                     await sendMessage(input);
                     setInput("");

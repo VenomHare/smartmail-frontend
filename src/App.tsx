@@ -3,6 +3,9 @@ import './App.css'
 import Generate from './app/generate'
 import Home from './app/home'
 import EmailUUID from './app/mail/uuid'
+import LoginPage from './app/auth/login'
+import SignupPage from './app/auth/signup'
+import CallbackPage from './app/auth/callback'
 
 function App() {
 
@@ -11,6 +14,11 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
+
+          <Route path='/login' element={<LoginPage/>} />
+          <Route path='/signup' element={<SignupPage/>} />
+          <Route path='/auth/callback' element={<CallbackPage/>} />
+
           <Route path="/generate" element={<Generate />} />
           <Route path="/mail/:uuid" element={<EmailUUID />} />
         </Routes>

@@ -18,9 +18,10 @@ type Props = {
     setInput: (e: string) => void
     inputType?: InputType
     optional?: boolean
+    disabled?: boolean
 }
 
-const TextareaTemplate = ({ label, placeholder, input, setInput, id, inputType, optional }: Props) => {
+const TextareaTemplate = ({ label, placeholder, input, setInput, id, inputType, optional, disabled }: Props) => {
 
     if (inputType == undefined) {
         return (<>
@@ -30,6 +31,7 @@ const TextareaTemplate = ({ label, placeholder, input, setInput, id, inputType, 
                     required={!(optional !== undefined || optional)}
                     placeholder={placeholder} id={id} value={input}
                     onChange={(e) => { setInput(e.target.value) }}
+                    disabled={disabled}
                 />
             </Field>
         </>)
@@ -49,6 +51,7 @@ const TextareaTemplate = ({ label, placeholder, input, setInput, id, inputType, 
                     }
                 }}
                     required={!(optional !== undefined || optional)}
+                    disabled={disabled}
                 >
                     <SelectTrigger id={id}>
                         <SelectValue placeholder="Select Option" />
@@ -65,9 +68,9 @@ const TextareaTemplate = ({ label, placeholder, input, setInput, id, inputType, 
                 {
                     otherSelected && (
                         inputType.textarea ?
-                            <Textarea placeholder={"Enter Details"} id={id} onChange={(e) => { setInput(e.target.value) }} />
+                            <Textarea disabled={disabled} required={!(optional !== undefined || optional)} placeholder={"Enter Details"} id={id} onChange={(e) => { setInput(e.target.value) }} />
                             :
-                            <Input placeholder={"Enter Details"} id={id} onChange={(e) => { setInput(e.target.value) }} />
+                            <Input disabled={disabled} required={!(optional !== undefined || optional)} placeholder={"Enter Details"} id={id} onChange={(e) => { setInput(e.target.value) }} />
                     )
                 }
             </Field>

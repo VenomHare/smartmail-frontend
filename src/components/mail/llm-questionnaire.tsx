@@ -4,16 +4,19 @@ import { FieldDescription, FieldGroup, FieldLegend, FieldSet } from "../ui/field
 import TextareaTemplate from "../textarea-template";
 import Navbar from "../navbar";
 import { useState } from "react";
+import { Spinner } from "../ui/spinner";
 
 interface Props {
     questions: LLMQuestions[]
+    loading: boolean
+    handleSubmit: (ans: string) => Promise<void>
 }
 
-const LLMQuestionnaire = ({ questions }: Props) => {
+const LLMQuestionnaire = ({ questions, loading, handleSubmit }: Props) => {
 
 
 
-    const [answers, setAnswers] = useState<{question: string, answer: string}[]>(
+    const [answers, setAnswers] = useState<{ question: string, answer: string }[]>(
         questions.map(q => ({
             question: q.question,
             answer: ""
@@ -21,12 +24,10 @@ const LLMQuestionnaire = ({ questions }: Props) => {
     );
 
     return (<>
-
         <Navbar />
-        <form className="w-full max-w-7xl mx-auto my-10 px-5" onSubmit={(e) => {
+        <form className="w-full max-w-7xl mx-auto my-10 px-5" onSubmit={async (e) => {
             e.preventDefault();
-            console.log(answers)
-            alert(answers.map((q,i)=> (`${i+1}. ${q.question} : ${q.answer}`)).join(" "));
+            await handleSubmit(answers.map((q, i) => (`${i + 1}. ${q.question} : ${q.answer}`)).join(" "));
         }}>
             <FieldGroup>
                 <FieldSet>
@@ -57,6 +58,7 @@ const LLMQuestionnaire = ({ questions }: Props) => {
                                         textarea: q.textarea,
                                         options: q.options
                                     }}
+                                    disabled={loading}
                                 />
                             </FieldGroup>
                         </>
@@ -75,13 +77,20 @@ const LLMQuestionnaire = ({ questions }: Props) => {
                                     }}
                                     label={q.question}
                                     id={"llm-question-" + i}
+                                    disabled={loading}
                                 />
                             </FieldGroup>
                         </>)
                     }
                 })
             }
-            <Button type="submit">Generate</Button>
+            <Button type="submit">
+                {
+                    loading
+                        ? <Spinner />
+                        : <>Generate</>
+                }
+            </Button>
         </form>
     </>)
 

@@ -1,4 +1,8 @@
 export const Config = {
+    backend_url: "http://localhost:3001",
+    frontend_url: "http://localhost:3000",
+    status_polling_delay: 3000,
+
     goalQuestion: {
         question: "What is the goal or purpose of this email?",
         textarea: false,
