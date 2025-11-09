@@ -6,6 +6,7 @@ import EmailUUID from './app/mail/uuid'
 import LoginPage from './app/auth/login'
 import SignupPage from './app/auth/signup'
 import CallbackPage from './app/auth/callback'
+import ResetPage from './app/auth/reset'
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
 
           <Route path='/login' element={<LoginPage/>} />
           <Route path='/signup' element={<SignupPage/>} />
+          <Route path="/password/reset" element={<ResetPage/>} />
           <Route path='/auth/callback' element={<CallbackPage/>} />
 
           <Route path="/generate" element={<Generate />} />

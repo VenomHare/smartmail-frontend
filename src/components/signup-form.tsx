@@ -17,48 +17,39 @@ import {
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { Config } from "@/lib/config"
-import { supabase } from "@/lib/supabase"
+import axios from "axios"
+import { useSearchParams } from "react-router"
 
 export function SignupForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
 
+    const [params] = useSearchParams();
+    const redirect = params.get("redirect") || `${Config.frontend_url}/`;
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const signupWithPassword = async (email: string, password: string) => {
         try {
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password
+            await axios.post(`${Config.backend_url}/auth/signup?redirect=${redirect}`, { email, password }, {
+                withCredentials: true
             });
-
-            if (error) {
-                alert("something went wrong! Try Again");
-                return
-            }
-
-            console.log(data);
+            window.location.href = redirect;
         }
         catch (err) {
             console.log(err);
+            alert("Incorrect Email or Password");
+            return
         }
+
     }
+
 
     const handleGoogleAuth = async () => {
         try {
-            const { data, error } = await supabase.auth.signInWithOAuth({
-                provider: "google",
-                options: {
-                    redirectTo: `${Config.frontend_url}/auth/callback`,
-                    queryParams: {
-                        access_type: 'offline',
-                        prompt: 'consent',
-                    }
-                }
-            })
-            if (error || !data.url) {
+            const { data } = await axios.get(`${Config.backend_url}/auth/google`);
+            if (!data.url) {
                 alert("something went wrong! Try Again");
                 return
             }

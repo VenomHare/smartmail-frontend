@@ -1,17 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/lib/supabase";
+import { Config } from "@/lib/config";
 import { cn } from "@/lib/utils";
+import axios from "axios";
 import { LoaderIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 
 const CallbackPage = () => {
 
     const [error, setError] = useState(false);
     const [params] = useSearchParams();
     const code = params.get("code");
-
+    const navigate = useNavigate();
 
     useEffect(() => { loginRequest() }, [])
 
@@ -20,13 +21,12 @@ const CallbackPage = () => {
             return
         }
         try {
-            const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-            if (error) {
-                alert("something went wrong! Try Again");
-                return
-            }
-            console.log(data);
-            // navigate("/");
+            await axios.post(`${Config.backend_url}/auth/callback`, {
+                code
+            }, {
+                withCredentials: true
+            })
+            navigate("/");
         }
         catch (err) {
             console.log(err);
