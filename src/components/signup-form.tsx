@@ -48,7 +48,9 @@ export function SignupForm({
 
     const handleGoogleAuth = async () => {
         try {
-            const { data } = await axios.get(`${Config.backend_url}/auth/google`);
+            const { data } = await axios.get(`${Config.backend_url}/auth/google`, {
+                withCredentials: true
+            });
             if (!data.url) {
                 alert("something went wrong! Try Again");
                 return

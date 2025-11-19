@@ -7,6 +7,7 @@ import React, { useState } from "react"
 import axios, { AxiosError } from 'axios'
 import { useNavigate } from "react-router";
 import { Spinner } from "@/components/ui/spinner";
+import { AppSidebar } from "@/components/app-sidebar";
 
 const Generate = () => {
 
@@ -45,6 +46,7 @@ const Generate = () => {
 
     return (<>
         <Navbar />
+        <AppSidebar />
         <form className="w-full max-w-7xl mx-auto my-10 px-5" onSubmit={handleCreation}>
             <FieldGroup>
                 <FieldSet>

@@ -3,11 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Item, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Spinner } from "@/components/ui/spinner";
 import { MailX } from "lucide-react";
+import { AppSidebar } from "../app-sidebar";
 
 
 export const MailNotFound = () => {
     return (<>
         <Navbar />
+        <AppSidebar/>
         <div className="max-w-7xl mx-auto px-5 flex items-center justify-center p-8">
             <Card className="w-full max-w-sm">
                 <CardContent className="flex flex-col items-center text-center py-8">
@@ -24,6 +26,7 @@ export const MailNotFound = () => {
 export const RequestInQueue = () => {
     return (<>
         <Navbar />
+        <AppSidebar/>
         <div className="max-w-7xl mx-auto px-5 flex items-center justify-center p-8">
             <Card className="w-full max-w-sm">
                 <CardContent className="flex flex-col items-center text-center py-8">
@@ -40,6 +43,7 @@ export const RequestInQueue = () => {
 export const RequestProcessing = () => {
     return (<>
         <Navbar />
+        <AppSidebar/>
         <div className="w-full max-w-7xl px-5 mx-auto">
             <Item variant={"muted"} className="my-3">
                 <ItemMedia>

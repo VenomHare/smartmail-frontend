@@ -38,3 +38,11 @@ export type ChatMessage = {
     role : "assistant" | "user"
     message: string
 }
+
+export interface User {
+    id: string,
+    full_name?: string,
+    avatar_url?: string,
+    username?: string,
+    bio?: string,
+} 

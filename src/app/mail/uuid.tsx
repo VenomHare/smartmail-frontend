@@ -1,4 +1,5 @@
 
+import { AppSidebar } from "@/components/app-sidebar";
 import { useStatusPolling } from "@/components/hooks/use-status-polling";
 import LLMQuestionnaire from "@/components/mail/llm-questionnaire";
 import { MailNotFound, RequestInQueue, RequestProcessing } from "@/components/mail/screens";
@@ -63,6 +64,7 @@ const EmailUUID = () => {
     if (llmResponse.status == "processed" && llmResponse.response.type == "mail") {
         return (<>
             <Navbar />
+            <AppSidebar />
             <div className="max-w-7xl mx-auto px-5 flex items-center justify-center p-8">
                 <div className="w-full md:h-[80svh] gap-3 flex flex-col justify-center items-center md:flex-row md:justifty-between">
                     <MailPreview html={llmResponse.response.html} />
