@@ -56,3 +56,20 @@ export const RequestProcessing = () => {
         </div>
     </>)
 }
+
+export const LoadingMail = () => {
+    return (<>
+        <Navbar />
+        <AppSidebar/>
+        <div className="w-full max-w-7xl px-5 mx-auto">
+            <Item variant={"muted"} className="my-3">
+                <ItemMedia>
+                    <Spinner />
+                </ItemMedia>
+                <ItemContent>
+                    <ItemTitle className="line-clamp-1">Loading ...</ItemTitle>
+                </ItemContent>
+            </Item>
+        </div>
+    </>)
+}

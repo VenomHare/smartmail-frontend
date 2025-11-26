@@ -70,7 +70,7 @@ export function AppSidebar() {
             <SidebarFooter>
                 <NavUser user={{
                     avatar: user?.avatar_url || "",
-                    email: user?.username || "",
+                    plan: "Free Plan",
                     name: user?.full_name || ""
                 }} />
             </SidebarFooter>

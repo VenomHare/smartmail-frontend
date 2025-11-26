@@ -10,6 +10,9 @@ export type LLMQuestions = {
 }
 
 export type MailResponse = {
+    uuid: string,
+    status: "loading"
+} | {
     uuid: string
     status: "inqueue"
 } | {

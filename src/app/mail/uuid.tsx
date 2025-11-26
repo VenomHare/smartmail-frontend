@@ -2,13 +2,16 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { useStatusPolling } from "@/components/hooks/use-status-polling";
 import LLMQuestionnaire from "@/components/mail/llm-questionnaire";
-import { MailNotFound, RequestInQueue, RequestProcessing } from "@/components/mail/screens";
+import { LoadingMail, MailNotFound, RequestInQueue, RequestProcessing } from "@/components/mail/screens";
 import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { ChatMessage } from "@/lib/types";
+import { addUserChat, setProcessingChat } from "@/store/generation";
+import type { RootState } from "@/store/store";
 import { Copy, MailPlus, Send } from "lucide-react";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 
 const scrollbar_css = `
@@ -30,23 +33,20 @@ const EmailUUID = () => {
         return (<MailNotFound />)
     }
 
+    const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const { llmResponse, sendExtraAnswers } = useStatusPolling(uuid, setLoading);
-
-    const [chats, setChats] = useState<ChatMessage[]>([{
-        role: "assistant",
-        message: "here's your perfect mail"
-    }]);
+    const { chats } = useSelector((state: RootState) =>  state.generation);
 
     const sendChatMessage = async (message: string) => {
-        setChats((prev) => {
-            const obj = [...prev];
-            obj.push({
-                role: "user",
-                message
-            })
-            return obj
-        })
+        dispatch(addUserChat(message));
+        dispatch(setProcessingChat(true));
+        setTimeout(() => {
+            // dispatch(setProcessingChat(false));
+        }, 15 * 1000)
+    }
+    if (llmResponse.status == "loading") {
+        return (<LoadingMail />)
     }
 
     if (llmResponse.status == "inqueue") {
@@ -93,6 +93,7 @@ interface ChatSectionProps {
 
 const AIChatSection = ({ chats, sendMessage }: ChatSectionProps) => {
     const [input, setInput] = useState("");
+    const { processingChat } = useSelector((state: RootState) => state.generation);
 
     return (<>
         <div className="min-h-[40dvh] md:w-1/3 flex flex-col items-center justify-between gap-2">
@@ -126,6 +127,10 @@ const AIChatSection = ({ chats, sendMessage }: ChatSectionProps) => {
                             }
                         })
                     }
+                    {
+                        processingChat &&
+                        <AssistantProcessing />
+                    }
                 </div>
                 <form onSubmit={async (e) => {
                     e.preventDefault();
@@ -155,6 +160,19 @@ const AssistantMessage = ({ message }: { message: string }) => {
         </div>
     </>)
 }
+
+const AssistantProcessing = () => {
+    return (<>
+        <div className="w-fit max-w-[90%] h-fit shadow border bg-primary text-primary-foreground p-2">
+            <div className="flex items-center gap-1 select-none px-2 py-1">
+                <span className="w-2 h-2 bg-secondary-foreground/90 rounded-full animate-bounce [animation-delay:0ms]"></span>
+                <span className="w-2 h-2 bg-secondary-foreground/60 rounded-full animate-bounce [animation-delay:120ms]"></span>
+                <span className="w-2 h-2 bg-secondary-foreground/40 rounded-full animate-bounce [animation-delay:240ms]"></span>
+            </div>
+        </div>
+    </>)
+}
+
 
 const UserMessage = ({ message }: { message: string }) => {
     return (<>
