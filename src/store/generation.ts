@@ -1,22 +1,44 @@
+import { Config } from "@/lib/config";
 import type { ChatMessage } from "@/lib/types";
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import axios from "axios";
 
 interface GenerationState {
     processingChat: boolean,
+    currentChatId: string,
     chats: ChatMessage[]
 }
 
 const initialState: GenerationState = {
     processingChat: false,
+    currentChatId: "",
     chats: []
-}   
+}
+
+export const updateChats = createAsyncThunk("generation/update-chats", async (mail_id: string) => {
+
+    const { data } = await axios.get(`${Config.backend_url}/chats/${mail_id}`, {
+        withCredentials: true
+    });
+
+    return data.chats.map((chat: any) => ({
+        message: chat.message,
+        role: chat.role
+    }));
+
+})
 
 const generationSlice = createSlice({
     name: "generation",
     initialState,
     reducers: {
-        setProcessingChat: (state, action: PayloadAction<boolean>) => {
-            state.processingChat = action.payload
+        startProcessingChat: (state, action: PayloadAction<string>) => {
+            state.processingChat = true;
+            state.currentChatId = action.payload;
+        },
+        endProcessingChat: (state) => {
+            state.currentChatId = "";
+            state.processingChat = false;
         },
         addUserChat: (state, action: PayloadAction<string>) => {
             state.chats.push({
@@ -30,11 +52,23 @@ const generationSlice = createSlice({
                 message: action.payload
             })
         },
-        setChats: (state, action: PayloadAction<ChatMessage[]>) => {            
+        setChats: (state, action: PayloadAction<ChatMessage[]>) => {
             state.chats = action.payload;
         }
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(updateChats.fulfilled, (state, action: PayloadAction<ChatMessage[]>) => {
+                state.chats = action.payload;
+            })
+            .addCase(updateChats.rejected, (state) => {
+                alert("Failed to update chat!");
+                state.chats = [];
+            })
+            
     }
+
 })
 
-export const { setProcessingChat, addAssistantChat, addUserChat, setChats } = generationSlice.actions;
+export const { startProcessingChat, endProcessingChat, addAssistantChat, addUserChat, setChats } = generationSlice.actions;
 export default generationSlice.reducer;

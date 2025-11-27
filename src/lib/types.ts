@@ -39,7 +39,7 @@ export type MailResponse = {
 
 export type ChatMessage = { 
     role : "assistant" | "user"
-    message: string
+    message: string 
 }
 
 export interface User {

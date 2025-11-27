@@ -7,12 +7,12 @@ import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { ChatMessage } from "@/lib/types";
-import { addUserChat, setProcessingChat } from "@/store/generation";
+import { addUserChat } from "@/store/generation";
 import type { RootState } from "@/store/store";
 import { Copy, MailPlus, Send } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 
 const scrollbar_css = `
     [&::-webkit-scrollbar]:w-2
@@ -35,16 +35,14 @@ const EmailUUID = () => {
 
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
-    const { llmResponse, sendExtraAnswers } = useStatusPolling(uuid, setLoading);
-    const { chats } = useSelector((state: RootState) =>  state.generation);
+    const { llmResponse, sendExtraAnswers, sendChat } = useStatusPolling(uuid, setLoading);
+    const { chats } = useSelector((state: RootState) => state.generation);
 
     const sendChatMessage = async (message: string) => {
         dispatch(addUserChat(message));
-        dispatch(setProcessingChat(true));
-        setTimeout(() => {
-            // dispatch(setProcessingChat(false));
-        }, 15 * 1000)
+        sendChat(message);
     }
+
     if (llmResponse.status == "loading") {
         return (<LoadingMail />)
     }
@@ -61,6 +59,25 @@ const EmailUUID = () => {
         return (<LLMQuestionnaire questions={llmResponse.response.questions} handleSubmit={sendExtraAnswers} loading={loading} />)
     }
 
+    const copyMailToClipBoard = () => {
+        try {
+
+            if (llmResponse.response.type !== "mail") { return }
+            const HTMLBlob = new Blob([llmResponse.response.html], {
+                type: "text/html"
+            });
+            const PlainBlob = new Blob(["Just Paste (Ctrl + V) in Compose Box of you Mailbox to use this Amazing Mail"], {
+                type: "text/plain"
+            })
+            const HtmlItem = new ClipboardItem({ ["text/html"]: HTMLBlob, ["text/plain"]: PlainBlob });
+            window.navigator.clipboard.write([HtmlItem])
+        }
+        catch(err){
+            console.log(err);
+            alert("Failed to Copy mail")
+        }
+    }
+
     if (llmResponse.status == "processed" && llmResponse.response.type == "mail") {
         return (<>
             <Navbar />
@@ -68,7 +85,7 @@ const EmailUUID = () => {
             <div className="max-w-7xl mx-auto px-5 flex items-center justify-center p-8">
                 <div className="w-full md:h-[80svh] gap-3 flex flex-col justify-center items-center md:flex-row md:justifty-between">
                     <MailPreview html={llmResponse.response.html} />
-                    <AIChatSection chats={chats} sendMessage={sendChatMessage} />
+                    <AIChatSection chats={chats} sendMessage={sendChatMessage} copyMailToClipBoard={copyMailToClipBoard} />
                 </div>
             </div>
         </>)
@@ -89,9 +106,10 @@ const MailPreview = ({ html }: { html: string }) => {
 interface ChatSectionProps {
     chats: ChatMessage[]
     sendMessage: (message: string) => Promise<void>
+    copyMailToClipBoard: () => void
 }
 
-const AIChatSection = ({ chats, sendMessage }: ChatSectionProps) => {
+const AIChatSection = ({ chats, sendMessage, copyMailToClipBoard }: ChatSectionProps) => {
     const [input, setInput] = useState("");
     const { processingChat } = useSelector((state: RootState) => state.generation);
 
@@ -102,20 +120,22 @@ const AIChatSection = ({ chats, sendMessage }: ChatSectionProps) => {
                     <Send />
                     Send to Gmail
                 </Button>
-                <Button size={"lg"} variant={"ghost"} className="flex flex-col h-fit py-2">
+                <Button size={"lg"} variant={"ghost"} className="flex flex-col h-fit py-2" onClick={copyMailToClipBoard}>
                     <Copy />
                     Copy to Clipboard
                 </Button>
-                <Button size={"lg"} variant={"ghost"} className="flex flex-col h-fit py-2">
-                    <MailPlus />
-                    Create New Mail
-                </Button>
+                <Link to={"/generate"}>
+                    <Button size={"lg"} variant={"ghost"} className="flex flex-col h-fit py-2">
+                        <MailPlus />
+                        Create New Mail
+                    </Button>
+                </Link>
             </div>
             <div className="w-full h-[70dvh] shadow border p-2 flex flex-col justify-between items-center overflow-clip bg-background">
                 <h3 className="text-accent-foreground text-xl text-center">
                     Chat with AI
                 </h3>
-                <div className="w-full h-9/10 py-2 flex flex-col gap-2">
+                <div className={"w-full h-9/10 py-2 flex flex-col gap-2 overflow-y-auto overflow-x-clip " + scrollbar_css}>
                     {/* Messages here */}
                     {
                         chats.map(c => {
