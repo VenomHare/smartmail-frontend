@@ -7,6 +7,7 @@ import LoginPage from './app/auth/login'
 import SignupPage from './app/auth/signup'
 import CallbackPage from './app/auth/callback'
 import ResetPage from './app/auth/reset'
+import GmailLink from './app/gmail'
 
 function App() {
 
@@ -23,6 +24,9 @@ function App() {
 
           <Route path="/generate" element={<Generate />} />
           <Route path="/mail/:uuid" element={<EmailUUID />} />
+
+          <Route path="/link/gmail" element={<GmailLink />} />
+
         </Routes>
       </BrowserRouter>
     </>

@@ -49,3 +49,8 @@ export interface User {
     username?: string,
     bio?: string,
 } 
+
+export interface MailHistoryItem {
+    uuid: string,
+    subject: string
+}

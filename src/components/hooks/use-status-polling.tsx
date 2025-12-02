@@ -1,8 +1,8 @@
 import { Config } from "@/lib/config";
 import type { MailResponse } from "@/lib/types";
-import { addAssistantChat, startProcessingChat, endProcessingChat, updateChats, setChats } from "@/store/generation";
+import { startProcessingChat, endProcessingChat, updateChats, setChats } from "@/store/generation";
 import type { RootState } from "@/store/store";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
@@ -25,7 +25,7 @@ export const useStatusPolling = (uuid: string, setLoading: (e: boolean) => void)
             if (llmResponse.status !== "processed") {
                 console.log(llmResponse.status);
                 try {
-                    const { data } = await axios.get(`${Config.backend_url}/status/${uuid}`);
+                    const { data } = await axios.get(`${Config.backend_url}/status/${uuid}`, { withCredentials: true });
                     setLlmResponse(data);
                 }
                 catch (err) {
@@ -54,7 +54,7 @@ export const useStatusPolling = (uuid: string, setLoading: (e: boolean) => void)
                     console.log(data);
 
                     if (data.status == "processed") {
-                        const { data } = await axios.get(`${Config.backend_url}/status/${uuid}`);
+                        const { data } = await axios.get(`${Config.backend_url}/status/${uuid}`, { withCredentials: true });
                         setLlmResponse(data);
                         appDispatch(updateChats(uuid));
                         dispatch(endProcessingChat());
@@ -72,12 +72,12 @@ export const useStatusPolling = (uuid: string, setLoading: (e: boolean) => void)
         }
     }, [processingChat])
 
-    useEffect(()=>{
+    useEffect(() => {
         appDispatch(updateChats(uuid));
         return () => {
             dispatch(setChats([]));
         }
-    },[])
+    }, [])
 
     const sendExtraAnswers = async (answers: string) => {
         try {
@@ -102,8 +102,7 @@ export const useStatusPolling = (uuid: string, setLoading: (e: boolean) => void)
     }
 
     const sendChat = async (message: string) => {
-        try 
-        {   
+        try {
             if (processingChat) {
                 return
             }
@@ -121,7 +120,17 @@ export const useStatusPolling = (uuid: string, setLoading: (e: boolean) => void)
             }
         }
         catch (err) {
-            alert("Failed to send chat!")
+            if (err instanceof AxiosError) {
+                if (err.status == 429) {
+                    alert(err.response?.data.message)
+                }
+                else {
+                    alert("Failed to send chat!")
+                }
+            }
+            else {
+                alert("Failed to send chat!")
+            }
         }
     }
 
