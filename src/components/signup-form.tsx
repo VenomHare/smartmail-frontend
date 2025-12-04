@@ -19,6 +19,7 @@ import { useState } from "react"
 import { Config } from "@/lib/config"
 import axios from "axios"
 import { useSearchParams } from "react-router"
+import { toast } from "sonner"
 
 export function SignupForm({
     className,
@@ -39,7 +40,7 @@ export function SignupForm({
         }
         catch (err) {
             console.log(err);
-            alert("Incorrect Email or Password");
+            toast.error("Incorrect Email or Password");
             return
         }
 
@@ -52,7 +53,7 @@ export function SignupForm({
                 withCredentials: true
             });
             if (!data.url) {
-                alert("something went wrong! Try Again");
+                toast.error("something went wrong! Try Again");
                 return
             }
             window.location.href = data.url;

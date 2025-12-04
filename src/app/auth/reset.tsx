@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import axios from "axios";
 import { CircleCheckBig } from "lucide-react";
 import React, { useState } from "react";
+import { toast } from "sonner";
 
 
 export default function ResetPage() {
@@ -23,7 +24,7 @@ export default function ResetPage() {
             setLinkSent(true);
         }
         catch(err) {
-            alert("Something went wrong! Try Again!")
+            toast.error("Something went wrong! Try Again!")
         }
     }
 

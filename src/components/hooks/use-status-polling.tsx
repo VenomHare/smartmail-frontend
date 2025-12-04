@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import useAppDispatch from "./use-app-dispatch";
+import { toast } from "sonner";
 
 export const useStatusPolling = (uuid: string, setLoading: (e: boolean) => void) => {
 
@@ -29,7 +30,7 @@ export const useStatusPolling = (uuid: string, setLoading: (e: boolean) => void)
                     setLlmResponse(data);
                 }
                 catch (err) {
-                    alert("Something Went Wrong! Try Again!")
+                    toast.error("Something Went Wrong! Try Again!")
                     navigate("/generate");
                 }
             }
@@ -61,7 +62,7 @@ export const useStatusPolling = (uuid: string, setLoading: (e: boolean) => void)
                     }
                 }
                 catch (error) {
-                    alert("Failed to update email");
+                    toast.error("Failed to update email");
                     dispatch(endProcessingChat())
                 }
 
@@ -93,7 +94,7 @@ export const useStatusPolling = (uuid: string, setLoading: (e: boolean) => void)
             setLlmResponse(data);
         }
         catch (err) {
-            alert("Something Went Wrong! Try Again!")
+            toast.error("Something Went Wrong! Try Again!")
             navigate("/generate");
         }
         finally {
@@ -122,14 +123,14 @@ export const useStatusPolling = (uuid: string, setLoading: (e: boolean) => void)
         catch (err) {
             if (err instanceof AxiosError) {
                 if (err.status == 429) {
-                    alert(err.response?.data.message)
+                    toast.error(err.response?.data.message)
                 }
                 else {
-                    alert("Failed to send chat!")
+                    toast.error("Failed to send chat!")
                 }
             }
             else {
-                alert("Failed to send chat!")
+                toast.error("Failed to send chat!")
             }
         }
     }

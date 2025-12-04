@@ -2,6 +2,7 @@ import { Config } from "@/lib/config";
 import type { ChatMessage } from "@/lib/types";
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
+import { toast } from "sonner";
 
 interface GenerationState {
     processingChat: boolean,
@@ -62,7 +63,7 @@ const generationSlice = createSlice({
                 state.chats = action.payload;
             })
             .addCase(updateChats.rejected, (state) => {
-                alert("Failed to update chat!");
+                toast.warning("Failed to update chat!");
                 state.chats = [];
             })
             

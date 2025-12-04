@@ -8,6 +8,7 @@ import axios, { AxiosError } from 'axios'
 import { useNavigate } from "react-router";
 import { Spinner } from "@/components/ui/spinner";
 import { AppSidebar } from "@/components/app-sidebar";
+import { toast } from "sonner";
 
 const Generate = () => {
 
@@ -24,7 +25,8 @@ const Generate = () => {
             }, {
                 headers: {
                     "Content-Type":"application/json"
-                }
+                },
+                withCredentials: true   
             })
 
             if (!data.uuid) {
@@ -35,7 +37,7 @@ const Generate = () => {
         }
         catch(err) {
             if (err instanceof AxiosError) {
-                alert((err as any).data.message);
+                toast.error((err as any).data.message);
             }
             console.log(err);
         }
