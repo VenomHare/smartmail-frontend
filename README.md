@@ -53,7 +53,7 @@
 
 **Status Request will 3 Types of Responses**
 1. Inqueue
-```json
+```js
 {
   uuid : "42fe6055-c111-4bb9-933f-b3c5ffd05f78"
   status: "inqueue"
@@ -62,7 +62,7 @@
 This means the Mail Generation request in inqueue to get processed which can be avoided by getting priority by upgrading to some plan.
 
 2. Processing Response
-```json
+```js
 {
     uuid : "42fe6055-c111-4bb9-933f-b3c5ffd05f78"
     status: "processing"
@@ -74,7 +74,7 @@ The Generation should have animations and cool loaders
 3. Processed Response  
 This response itself is 2 types  
   1. More Questions Response
-```json
+```js
 {
       uuid: "42fe6055-c111-4bb9-933f-b3c5ffd05f78",
       status: "processed",
@@ -101,7 +101,7 @@ This response itself is 2 types
 - llmMessage is basically something llm said  
 
 2. Mail Response
-```json
+```js
 {
   uuid: "42fe6055-c111-4bb9-933f-b3c5ffd05f78",
   status: "processed",
