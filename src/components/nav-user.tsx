@@ -27,17 +27,22 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useSelector } from "react-redux"
+import type { RootState } from "@/store/store"
+import useAppDispatch from "./hooks/use-app-dispatch"
+import { useEffect } from "react"
+import { getUserData } from "@/store/auth"
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string
-    plan: string
-    avatar: string
-  }
-}) {
-  const { isMobile } = useSidebar()
+export function NavUser() {
+  const { isMobile } = useSidebar();
+  const appDispatch = useAppDispatch();
+  const { user } = useSelector((state: RootState) => state.userdata);
+
+  useEffect(()=>{
+    if (!user) {
+      appDispatch(getUserData());
+    }
+  },[user]);
 
   return (
     <SidebarMenu>
@@ -49,12 +54,12 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarImage src={user?.avatar_url} alt={user?.username} />
+                <AvatarFallback className="rounded-lg">{user?.full_name?.split(" ").map((i, index) => index < 2 && i[0]).join("")}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs text-primary">{user.plan}</span>
+                <span className="truncate font-medium">{user?.full_name}</span>
+                <span className="truncate text-xs text-primary">{"Free Plan"}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -68,12 +73,12 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarImage src={user?.avatar_url} alt={user?.username} />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.plan}</span>
+                  <span className="truncate font-medium">{user?.full_name}</span>
+                  <span className="truncate text-xs">{"Free Plan"}</span>
                 </div>
               </div>
             </DropdownMenuLabel>

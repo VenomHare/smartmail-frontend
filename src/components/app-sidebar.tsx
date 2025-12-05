@@ -21,7 +21,6 @@ import { Config } from "@/lib/config";
 import type { MailHistoryItem } from "@/lib/types";
 
 export function AppSidebar() {
-    const { user } = useSelector((state: RootState) => state.userdata);
     const [history, setHistory] = useState<MailHistoryItem[]>([]);
 
     const { open } = useSidebar();
@@ -90,11 +89,7 @@ export function AppSidebar() {
                 }
             </SidebarContent>
             <SidebarFooter>
-                <NavUser user={{
-                    avatar: user?.avatar_url || "",
-                    plan: "Free Plan",
-                    name: user?.full_name || ""
-                }} />
+                <NavUser />
             </SidebarFooter>
         </Sidebar>
     )
