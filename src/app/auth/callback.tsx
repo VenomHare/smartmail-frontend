@@ -1,11 +1,12 @@
+import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DraftPilotLogo } from "@/components/ui/draft-mail-icon";
 import { Config } from "@/lib/config";
 import { cn } from "@/lib/utils";
 import axios from "axios";
-import { LoaderIcon } from "lucide-react";
+import { Loader, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 
 const CallbackPage = () => {
 
@@ -35,51 +36,51 @@ const CallbackPage = () => {
     }
 
     return (<>
-        <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-            <div className="flex w-full max-w-sm flex-col gap-6">
-                <a href="#" className="flex items-center gap-2 self-center text-accent-foreground font-bold text-2xl">
-                    <div className="text-primary-foreground flex size-6 items-center justify-center rounded-md">
-                        <img src="/vite.svg" alt="Smartmail Logo" />
+        <div className="min-h-screen bg-background flex flex-col">
+
+            <div className="flex-1 flex items-center justify-center p-4">
+                <div className="flex flex-col items-center justify-center text-center space-y-6">
+                    <div className="relative">
+                        <DraftPilotLogo className="h-20 w-20" />
+                        <div className={cn(
+                            "absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-primary flex items-center justify-center",
+                            error && "bg-red-500"
+                        )}>
+                            {
+                                error
+                                    ? <X className="h-4 w-4 text-primary-foreground" />
+                                    : <Loader className="h-4 w-4 animate-spin text-primary-foreground" />
+                            }
+                        </div>
                     </div>
-                    SmartMail AI
-                </a>
-                <div className={cn("flex flex-col gap-6")}>
-                    <Card>
-                        <CardHeader className="text-center">
-                            <CardTitle className="text-xl">Welcome back</CardTitle>
-                            <CardDescription>
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
+                    <div className="space-y-2">
+                        <h2 className="text-2xl font-semibold">
                             {
                                 error
                                     ? <>
-                                        <div className="flex flex-col items-center gap-3">
-                                            <p className="text-xl font-semibold text-accent-foreground text-center">
-                                                Login Failed.
-                                            </p>
-                                            <Link to={"/login"}>
-                                                <Button variant={"secondary"}>Retry</Button>
-                                            </Link>
-                                        </div>
+                                        Failed while Authenticating.
                                     </>
-                                    :
-                                    <div className="flex items-center justify-center gap-3">
-                                        <LoaderIcon
-                                            role="status"
-                                            aria-label="Loading"
-                                            className={cn("size-4 animate-spin text-accent")}
-                                        />
-                                        <p className="text-xl font-semibold text-accent-foreground">
-                                            Logging you in..
-                                        </p>
-                                    </div>
+                                    : <>
+                                        Signing you in...
+                                    </>
                             }
-                        </CardContent>
-                    </Card>
+                        </h2>
+                        {
+                            !error &&
+                            <p className="text-muted-foreground">
+                                Please wait while we complete the authentication
+                            </p>
+                        }
+                        {
+                            error && <Button variant={"outline"} className="mt-4" onClick={() => {navigate("/login")}}>
+                                Try Again
+                            </Button>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
+            <Footer />
+        </div >
     </>)
 }
 

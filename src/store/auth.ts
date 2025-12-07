@@ -1,15 +1,18 @@
 import { Config } from "@/lib/config";
-import type { User } from "@/lib/types";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import type { LinkedMail, User } from "@/lib/types";
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 
 
 export interface AuthState {
-    user?: User
+    user?: User,
+    linkedAccounts: LinkedMail[]
 }
 
 
 const initialState: AuthState = {
+    user: undefined,
+    linkedAccounts: [],
 }
 
 
@@ -18,7 +21,16 @@ export const getUserData = createAsyncThunk("userdata/getUserData", async () => 
         withCredentials: true
     });
     return (data as { user: User });
+});
+
+export const getLinkedAccounts = createAsyncThunk("userdata/getLinkedAccounts", async () => {
+    const { data } = await axios.get(
+        `${Config.backend_url}/gmail/accounts`,
+        { withCredentials: true },
+    );
+    return data
 })
+
 
 const AuthSlice = createSlice({
     name: "userdata",
@@ -36,6 +48,9 @@ const AuthSlice = createSlice({
                 else {
                     console.log("Failed to fetch User data",);
                 }
+            })
+            .addCase(getLinkedAccounts.fulfilled, (state, data: PayloadAction<LinkedMail[]>) => {
+                state.linkedAccounts = data.payload;
             })
     }
 })

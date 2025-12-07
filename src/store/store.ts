@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import AuthSlice from './auth'
 import generationSlice from './generation'
+import SidebarSlice from './sidebar'
 
 const store = configureStore({
     reducer: {
         userdata: AuthSlice,
-        generation: generationSlice
+        generation: generationSlice,
+        sidebar: SidebarSlice
     }
 })
 

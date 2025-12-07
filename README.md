@@ -32,6 +32,7 @@
 
 **Main Components**
 1. Sidebar  
+   - Sidebar must be applied to all pages.
    - Sidebar should contain Logo + Heading, Search for recent mails, List of Recent Mails, User Info (name, plan, avatar) with menu to drafts, profile, Upgrade, Logout,etc and a button to toggle sidebar  
    - Clicking on DraftPilot Logo  should take to home page  
    - Search should filter Recent Mails  
@@ -120,9 +121,11 @@ This response itself is 2 types
 1. It should have dynamically resizable, mobile, tablet and desktop display for mail  
 2. It should have a chat box to chat with ai  
 3. It should options to perform operations with mail (basically export mail)  
+4. Chat Box and Mail Preview will be the most important and used.
 
 **Chat Box**
 - Chat box will chats from ai and user  
+- Chat box must be already open.
 - It will be rate limited (3 chats to free users daily)  
 - Chats will be inqueue as well  
 

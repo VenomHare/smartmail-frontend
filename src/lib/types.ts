@@ -37,9 +37,11 @@ export type MailResponse = {
     }
 }
 
-export type ChatMessage = { 
-    role : "assistant" | "user"
-    message: string 
+export type ChatMessage = {
+    id: string
+    role: "user" | "assistant"
+    content: string
+    timestamp: Date
 }
 
 export interface User {
@@ -48,9 +50,14 @@ export interface User {
     avatar_url?: string,
     username?: string,
     bio?: string,
-} 
+}
 
 export interface MailHistoryItem {
     uuid: string,
-    subject: string
+    subject: string,
+}
+
+export interface LinkedMail {
+    mail: string
+    linkedAt: string
 }

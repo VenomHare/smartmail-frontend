@@ -7,12 +7,14 @@ import { toast } from "sonner";
 interface GenerationState {
     processingChat: boolean,
     currentChatId: string,
+    remainingChats: number,
     chats: ChatMessage[]
 }
 
 const initialState: GenerationState = {
     processingChat: false,
     currentChatId: "",
+    remainingChats: Config.MAX_CHATS,
     chats: []
 }
 
@@ -22,10 +24,7 @@ export const updateChats = createAsyncThunk("generation/update-chats", async (ma
         withCredentials: true
     });
 
-    return data.chats.map((chat: any) => ({
-        message: chat.message,
-        role: chat.role
-    }));
+    return data.chats.map((chat:any) => ({...chat, timestamp: new Date(chat.timestamp) }));
 
 })
 
@@ -41,20 +40,11 @@ const generationSlice = createSlice({
             state.currentChatId = "";
             state.processingChat = false;
         },
-        addUserChat: (state, action: PayloadAction<string>) => {
-            state.chats.push({
-                role: "user",
-                message: action.payload
-            })
-        },
-        addAssistantChat: (state, action: PayloadAction<string>) => {
-            state.chats.push({
-                role: "assistant",
-                message: action.payload
-            })
-        },
         setChats: (state, action: PayloadAction<ChatMessage[]>) => {
             state.chats = action.payload;
+        },
+        setRemainingChats: (state, action: PayloadAction<number>) => {
+            state.remainingChats = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -71,5 +61,5 @@ const generationSlice = createSlice({
 
 })
 
-export const { startProcessingChat, endProcessingChat, addAssistantChat, addUserChat, setChats } = generationSlice.actions;
+export const { startProcessingChat, endProcessingChat, setChats, setRemainingChats } = generationSlice.actions;
 export default generationSlice.reducer;

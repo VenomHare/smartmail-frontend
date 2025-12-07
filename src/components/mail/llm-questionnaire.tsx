@@ -1,99 +1,86 @@
 import type { LLMQuestions } from "@/lib/types";
 import { Button } from "../ui/button";
-import { FieldDescription, FieldGroup, FieldLegend, FieldSet } from "../ui/field";
-import TextareaTemplate from "../textarea-template";
+import React, { useMemo } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Loader, Send, Sparkles } from "lucide-react";
+import QuestionBlock from "../questions";
+import { toast } from "sonner";
 import Navbar from "../navbar";
-import { useState } from "react";
-import { Spinner } from "../ui/spinner";
+import { AppSidebar } from "../app-sidebar";
 
 interface Props {
     questions: LLMQuestions[]
     loading: boolean
     handleSubmit: (ans: string) => Promise<void>
+    llmMessage?: string
 }
 
-const LLMQuestionnaire = ({ questions, loading, handleSubmit }: Props) => {
 
 
+export function MailQuestions({ llmMessage, questions, handleSubmit, loading }: Props) {
+    const [answers, setAnswers] = React.useState<{
+        question: string,
+        answer: string
+    }[]>(questions.map(q => ({
+        question: q.question,
+        answer: ""
+    })))
 
-    const [answers, setAnswers] = useState<{ question: string, answer: string }[]>(
-        questions.map(q => ({
-            question: q.question,
-            answer: ""
-        }))
-    );
+
+    const onSubmit = async () => {
+        if (allAnswered) {
+            await handleSubmit(answers.map((q, i) => (`${i + 1}. ${q.question} : ${q.answer}`)).join(" "));
+        }
+    }
+    const handleAnswerChange = (index: number, value: string) => {
+        setAnswers((a) => {
+            a[index].answer = value;
+            return a;
+        })
+
+    }
+
+    const allAnswered = answers.every((answer) => {
+        return answer.answer?.trim().length > 0
+    });
 
     return (<>
         <Navbar />
-        <form className="w-full max-w-7xl mx-auto my-10 px-5" onSubmit={async (e) => {
-            e.preventDefault();
-            await handleSubmit(answers.map((q, i) => (`${i + 1}. ${q.question} : ${q.answer}`)).join(" "));
-        }}>
-            <FieldGroup>
-                <FieldSet>
-                    <FieldLegend>A Few more Questions</FieldLegend>
-                    <FieldDescription>
-                        Answer the following for more information
-                    </FieldDescription>
-                </FieldSet>
-            </FieldGroup>
-            {
-                questions.map((q, i) => {
-                    if (q.select) {
-                        return <>
-                            <FieldGroup>
-                                <TextareaTemplate
-                                    input={answers[i].answer}
-                                    setInput={(e) => {
-                                        setAnswers((prev) => {
-                                            const newArr = [...prev];
-                                            newArr[i] = { ...newArr[i], answer: e };
-                                            return newArr;
-                                        })
-                                    }}
-                                    label={q.question}
-                                    id={"llm-question-" + i}
-                                    inputType={{
-                                        select: true,
-                                        textarea: q.textarea,
-                                        options: q.options
-                                    }}
-                                    disabled={loading}
-                                />
-                            </FieldGroup>
+        <AppSidebar />
+        <Card className="w-full max-w-2xl mx-auto">
+            <CardHeader>
+                <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                        <CardTitle>Additional Information Needed</CardTitle>
+                        <CardDescription>{llmMessage || "Please answer these questions to continue"}</CardDescription>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                {questions.map((q, index) => (
+                    <QuestionBlock question={q} index={index.toString()} onChange={(value) => {
+                        handleAnswerChange(index, value);
+                    }} />
+                ))}
+
+                <Button onClick={onSubmit} disabled={!allAnswered || loading} className="w-full gap-2" size="lg">
+                    {loading ? (
+                        <>
+                            <Loader className="h-4 w-4 animate-spin" />
+                            Submitting...
                         </>
-                    }
-                    else {
-                        return (<>
-                            <FieldGroup>
-                                <TextareaTemplate
-                                    input={answers[i].answer}
-                                    setInput={(e) => {
-                                        setAnswers((prev) => {
-                                            const newArr = [...prev];
-                                            newArr[i] = { ...newArr[i], answer: e };
-                                            return newArr;
-                                        })
-                                    }}
-                                    label={q.question}
-                                    id={"llm-question-" + i}
-                                    disabled={loading}
-                                />
-                            </FieldGroup>
-                        </>)
-                    }
-                })
-            }
-            <Button type="submit">
-                {
-                    loading
-                        ? <Spinner />
-                        : <>Generate</>
-                }
-            </Button>
-        </form>
-    </>)
-
+                    ) : (
+                        <>
+                            <Send className="h-4 w-4" />
+                            Continue
+                        </>
+                    )}
+                </Button>
+            </CardContent>
+        </Card>
+    </>
+    )
 }
-
-export default LLMQuestionnaire;

@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router'
 import './App.css'
-import Generate from './app/generate'
 import Home from './app/home'
 import EmailUUID from './app/mail/uuid'
 import LoginPage from './app/auth/login'
@@ -8,6 +7,11 @@ import SignupPage from './app/auth/signup'
 import CallbackPage from './app/auth/callback'
 import ResetPage from './app/auth/reset'
 import GmailLink from './app/gmail'
+import AccountPage from './app/user/account'
+import TermsPage from './app/legal/terms'
+import PrivacyPage from './app/legal/privacy'
+import PricingPage from './app/pricing'
+import Onboarding from './app/auth/onboarding'
 
 function App() {
 
@@ -22,10 +26,15 @@ function App() {
           <Route path="/password/reset" element={<ResetPage/>} />
           <Route path='/auth/callback' element={<CallbackPage/>} />
 
-          <Route path="/generate" element={<Generate />} />
           <Route path="/mail/:uuid" element={<EmailUUID />} />
 
           <Route path="/link/gmail" element={<GmailLink />} />
+      
+          <Route path="/account" element={<AccountPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/onboarding" element={<Onboarding />} />
 
         </Routes>
       </BrowserRouter>

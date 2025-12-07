@@ -66,6 +66,7 @@
   --shadow-opacity: var(--shadow-opacity);
   --color-shadow-color: var(--shadow-color);
   --color-destructive-foreground: var(--destructive-foreground);
+  --animate-slide-left-right: slide-left-right .6s ease forwards;
 }
 
 :root {
@@ -186,5 +187,24 @@
   body {
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes slide-left-right {
+  from {
+    left: -100%;
+  }
+  to {
+    left: 0%;
   }
 }

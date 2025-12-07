@@ -1,11 +1,19 @@
+import type { LLMQuestions } from "./types";
+
 export const Config = {
     backend_url: "http://localhost:3001",
     frontend_url: "http://localhost:3000",
     status_polling_delay: 3000,
 
-    goalQuestion: {
+    MAX_CHATS: 5
+
+};
+
+export const InitQuestions: LLMQuestions[] = [
+    {
         question: "What is the goal or purpose of this email?",
         textarea: false,
+        select: true,
         options: [
             "Product promotion",
             "Newsletter update",
@@ -16,9 +24,10 @@ export const Config = {
             "Seasonal offer"
         ]
     },
-    audienceQuestion: {
+    {
         question: "Who is the target audience?",
         textarea: false,
+        select: true,
         options: [
             "Existing customers",
             "New leads / potential clients",
@@ -27,29 +36,22 @@ export const Config = {
             "Internal team / employees"
         ]
     },
-    headlineQuestion: {
+    {
         question: "What should be the main headline or title of the email?",
         textarea: true,
-        options: [
-            "Introducing Something Exciting from Our Team",
-            "A New Update You'll Love",
-            "Your Monthly Company Newsletter",
-            "We've Got Something Special for You"
-        ]
+        select: false,
+
     },
-    messageQuestion: {
+    {
         question: "What is the core message or offer you want to communicate?",
         textarea: true,
-        options: [
-            "We're thrilled to share our latest update that brings more value, performance, and ease to your experience.",
-            "Discover how our new product makes your workflow faster and smarter.",
-            "Stay up-to-date with our latest announcements and improvements.",
-            "Here's an exclusive offer just for you — limited time only!"
-        ]
+        select: false,
+
     },
-    ctaQuestion: {
+    {
         question: "What is the primary Call-To-Action (CTA)?",
         textarea: false,
+        select: true,
         options: [
             "Learn More",
             "Shop Now",
@@ -60,36 +62,36 @@ export const Config = {
             "None"
         ]
     },
-    senderQuestion: {
+    {
         question: "What is the sender name and company/brand that should appear in the email?",
-        textarea: true,
-        options: [
-            "The Marketing Team, Your Company Name",
-            "Customer Success Team, Your Brand",
-            "The Communications Team, Your Organization"
-        ]
+        textarea: false,
+        select: false,
+
     },
-    logoQuestion: {
+    {
         question: "Do you want to include a logo or banner image?",
         textarea: false,
+        select: true,
         options: [
             "Yes, include my brand logo",
             "Yes, include a custom banner",
             "No, use a color gradient header"
         ]
     },
-    colorQuestion: {
+    {
         question: "Do you want to use any specific brand colors or should the AI auto-generate a palette?",
         textarea: false,
+        select: true,
         options: [
             "Auto-generate a modern professional palette",
             "Use my brand colors (I'll specify them)",
             "Match the email to product theme"
         ]
     },
-    toneQuestion: {
+    {
         question: "Do you have a preferred tone for this email?",
         textarea: false,
+        select: true,
         options: [
             "Professional and polished",
             "Friendly and conversational",
@@ -97,4 +99,4 @@ export const Config = {
             "Bold and energetic"
         ]
     },
-};
+]

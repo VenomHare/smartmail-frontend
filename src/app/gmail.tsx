@@ -1,17 +1,12 @@
 import { AppSidebar } from "@/components/app-sidebar"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Spinner } from "@/components/ui/spinner"
+import { Button } from "@/components/ui/button"
+import { DraftPilotLogo } from "@/components/ui/draft-mail-icon"
 import { Config } from "@/lib/config"
 import axios from "axios"
-import { AlertCircle, CheckCircle2, Plus } from "lucide-react"
+import { AlertCircle, CheckCircle, Loader, Plus } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router"
+import { toast } from "sonner"
 
 type GmailStatus = "loading" | "success" | "error"
 
@@ -30,73 +25,103 @@ const GmailLink = () => {
 const GmailConnectCard = () => {
   const [params] = useSearchParams()
   const code = params.get("code");
+  const [status, setStatus] = useState<GmailStatus>("loading");
 
-  const [screen, setScreen] = useState<GmailStatus>("loading");
+  const handleClose = () => {
+    window.close()
+  }
+
+  const handleRetry = async () => {
+    try {
+      setStatus("loading");
+      const { data } = await axios.get(`${Config.backend_url}/gmail/add`, {
+        withCredentials: true
+      });
+      window.location.href = data.url;
+    }
+    catch (err) {
+      toast.error("Failed to initiate new Account link! Try Again Later.")
+      setStatus("error");
+    }
+  }
 
   useEffect(() => {
     const makeConnection = async () => {
       try {
         await axios.post(`${Config.backend_url}/gmail/creds`, { code }, { withCredentials: true });
-        setScreen("success");
+        setStatus("success");
       }
       catch {
-        setScreen("error")
+        setStatus("error")
       }
     }
     makeConnection();
   }, [code])
 
   return (
-    <Card className="w-full max-w-md text-center">
-      <CardHeader>
-        <CardTitle className="text-2xl">Connect Gmail</CardTitle>
-        <CardDescription>
-          Securely link Gmail so Draftfolio can help you manage emails.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex items-center justify-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <img
-              src="/testlogo3.svg"
-              alt="DraftPilot logo"
-              className="h-7 w-7"
-            />
+    <>
+      <div className="flex flex-col items-center justify-center text-center space-y-8 max-w-md">
+        {/* Logos */}
+        <div className="flex items-center gap-4">
+          <div className="h-16 w-16 rounded-2xl bg-card border border-border flex items-center justify-center">
+            <DraftPilotLogo className="h-10 w-10" />
           </div>
-          <Plus className="h-6 w-6 text-muted-foreground" />
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10">
-            <GmailLogo className="h-7 w-7" />
+          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+            <Plus className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <div className="h-16 w-16 rounded-2xl bg-card border border-border flex items-center justify-center">
+            <GmailLogo className="h-10 w-10" />
           </div>
         </div>
 
-        {screen == "loading" && (
-          <div className="flex flex-col items-center gap-3">
-            <Spinner className="h-5 w-5 text-accent" />
-            <p className="text-sm font-medium text-accent-foreground">
-              DraftPilot is connecting to Gmail…
-            </p>
-          </div>
-        )}
+        {/* Status Content */}
+        <div className="space-y-4">
+          {status === "loading" && (
+            <>
+              <div className="flex items-center justify-center">
+                <Loader className="h-8 w-8 animate-spin text-primary" />
+              </div>
+              <h2 className="text-2xl font-semibold">Linking Gmail Account</h2>
+              <p className="text-muted-foreground">Please wait while we connect your Gmail account to Draft Pilot AI</p>
+            </>
+          )}
 
-        {screen == "success" && (
-          <div className="flex flex-col items-center gap-3">
-            <CheckCircle2 className="h-6 w-6 text-emerald-500" />
-            <p className="text-sm font-medium text-accent-foreground">
-              You&apos;re all set! DraftPilot is now connected to Gmail.
-            </p>
-          </div>
-        )}
+          {status === "success" && (
+            <>
+              <div className="h-16 w-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto">
+                <CheckCircle className="h-8 w-8 text-green-500" />
+              </div>
+              <h2 className="text-2xl font-semibold">Successfully Linked!</h2>
+              <p className="text-muted-foreground">
+                Your Gmail account has been connected. You can now send drafts directly to your inbox.
+              </p>
+              <Button onClick={handleClose} className="mt-4">
+                Close Window
+              </Button>
+            </>
+          )}
 
-        {screen == "error" && (
-          <div className="flex flex-col items-center gap-3">
-            <AlertCircle className="h-6 w-6 text-destructive" />
-            <p className="text-sm font-medium text-accent-foreground">
-              We couldn&apos;t connect to Gmail. Please go back and try again.
-            </p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          {status === "error" && (
+            <>
+              <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
+                <AlertCircle className="h-8 w-8 text-destructive" />
+              </div>
+              <h2 className="text-2xl font-semibold">Linking Failed</h2>
+              <p className="text-muted-foreground">
+                We couldn't connect your Gmail account. Please try again or contact support if the issue persists.
+              </p>
+              <div className="flex gap-2 justify-center mt-4">
+                <Button variant="outline" onClick={handleClose}>
+                  Cancel
+                </Button>
+                <Button onClick={handleRetry}>Try Again</Button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+    </>
   )
 }
 

@@ -18,8 +18,11 @@ import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { Config } from "@/lib/config"
 import axios from "axios"
-import { useSearchParams } from "react-router"
+import { Link, useSearchParams } from "react-router"
 import { toast } from "sonner"
+import { Label } from "./ui/label"
+import { Eye, EyeOff, Loader } from "lucide-react"
+import { Checkbox } from "./ui/checkbox"
 
 export function SignupForm({
     className,
@@ -30,9 +33,31 @@ export function SignupForm({
     const redirect = params.get("redirect") || `${Config.frontend_url}/`;
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [agreeTerms, setAgreeTerms] = useState(false);
+    const [privacy, setPrivacy] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const signupWithPassword = async (email: string, password: string) => {
         try {
+            if (password.length < 8) {
+                toast.warning("Password too short!");
+                return                
+            }
+            if (password !== confirmPassword) {
+                toast.warning("Passwords doesn't match!");
+                return
+            }
+            if (!agreeTerms) {
+                toast.warning("Agree to Terms and condition to continue!");
+                return
+            }
+            if (!privacy) {
+                toast.warning("Agree to Privacy Policies to continue!");
+                return 
+            }
+            setIsLoading(true);
             await axios.post(`${Config.backend_url}/auth/signup?redirect=${redirect}`, { email, password }, {
                 withCredentials: true
             });
@@ -43,12 +68,16 @@ export function SignupForm({
             toast.error("Incorrect Email or Password");
             return
         }
+        finally {
+            setIsLoading(false);
+        }
 
     }
 
 
     const handleGoogleAuth = async () => {
         try {
+            setIsLoading(true);
             const { data } = await axios.get(`${Config.backend_url}/auth/google`, {
                 withCredentials: true
             });
@@ -60,6 +89,9 @@ export function SignupForm({
         }
         catch (err) {
             console.log(err);
+        }
+        finally {
+            setIsLoading(false)
         }
     }
 
@@ -104,25 +136,71 @@ export function SignupForm({
                                 />
                             </Field>
                             <Field>
-                                <div className="flex items-center">
-                                    <FieldLabel htmlFor="password">Password</FieldLabel>
-                                    <a
-                                        href="#"
-                                        className="ml-auto text-sm underline-offset-4 hover:underline"
-                                    >
-                                        Forgot your password?
-                                    </a>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="password">Password</Label>
+                                    <div className="relative">
+                                        <Input
+                                            id="password"
+                                            type={showPassword ? "text" : "password"}
+                                            placeholder="Create a password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            required
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                        >
+                                            {showPassword ? (
+                                                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                            ) : (
+                                                <Eye className="h-4 w-4 text-muted-foreground" />
+                                            )}
+                                        </Button>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">Must be at least 8 characters</p>
                                 </div>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => { setPassword(e.target.value) }}
-                                    required
-                                />
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                                    <Input
+                                        id="confirmPassword"
+                                        type="password"
+                                        placeholder="Confirm your password"
+                                        value={confirmPassword}
+                                        onChange={(e) => {setConfirmPassword(e.target.value)}}
+                                        required
+                                    />
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox id="terms" checked={agreeTerms} onCheckedChange={(checked) => setAgreeTerms(checked as boolean)} />
+                                    <Label htmlFor="terms" className="text-sm leading-tight">
+                                        I agree to the <Link to="/terms" className="text-primary hover:underline">Terms of Service.</Link> 
+                                    </Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox id="privacy" checked={privacy} onCheckedChange={(checked) => setPrivacy(checked as boolean)} />
+                                    <Label htmlFor="privacy" className="text-sm leading-tight">
+                                        I have read <Link to="/privacy" className="text-primary hover:underline">Privacy Policy.</Link>
+                                        </Label>
+                                </div>
+
+                                <Button type="submit" className="w-full" disabled={isLoading}>
+                                    {isLoading ? (
+                                        <>
+                                            <Loader className="mr-2 h-4 w-4 animate-spin" />
+                                            Creating account...
+                                        </>
+                                    ) : (
+                                        "Create account"
+                                    )}
+                                </Button>
                             </Field>
                             <Field>
-                                <Button type="submit">Signup</Button>
                                 <FieldDescription className="text-center">
                                     Already have an account? <a href="/login">Log in</a>
                                 </FieldDescription>
@@ -131,10 +209,6 @@ export function SignupForm({
                     </form>
                 </CardContent>
             </Card>
-            <FieldDescription className="px-6 text-center">
-                By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-                and <a href="#">Privacy Policy</a>.
-            </FieldDescription>
         </div>
     )
 }

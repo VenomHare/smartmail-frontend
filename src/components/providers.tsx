@@ -2,7 +2,6 @@ import type React from "react"
 import { ThemeProvider } from "./theme-provider"
 import { Provider } from "react-redux";
 import store from "@/store/store";
-import { SidebarProvider } from "./ui/sidebar";
 import { Toaster } from "./ui/sonner";
 
 interface Props {
@@ -14,9 +13,7 @@ export const Providers = ({ children }: Props) => {
         <Toaster position={"top-center"} />
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
             <Provider store={store}>
-                <SidebarProvider>
-                    {children}
-                </SidebarProvider>
+                {children}
             </Provider>
         </ThemeProvider>
     </>)

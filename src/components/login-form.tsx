@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { Config } from "@/lib/config"
 import axios from "axios"
-import { useSearchParams } from "react-router"
+import { Link, useSearchParams } from "react-router"
 import { toast } from "sonner"
 
 export function LoginForm({
@@ -102,12 +102,12 @@ export function LoginForm({
                             <Field>
                                 <div className="flex items-center">
                                     <FieldLabel htmlFor="password">Password</FieldLabel>
-                                    <a
-                                        href="#"
+                                    <Link
+                                        to="/password/reset"
                                         className="ml-auto text-sm underline-offset-4 hover:underline"
                                     >
                                         Forgot your password?
-                                    </a>
+                                    </Link>
                                 </div>
                                 <Input
                                     id="password"
@@ -128,8 +128,8 @@ export function LoginForm({
                 </CardContent>
             </Card>
             <FieldDescription className="px-6 text-center">
-                By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-                and <a href="#">Privacy Policy</a>.
+                By continuing, you agree to our <Link to="/terms">Terms of Service</Link>{" "}
+                and <Link to="/privacy">Privacy Policy</Link>.
             </FieldDescription>
         </div>
     )

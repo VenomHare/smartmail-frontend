@@ -1,6 +1,6 @@
 import { Config } from "@/lib/config";
 import type { MailResponse } from "@/lib/types";
-import { startProcessingChat, endProcessingChat, updateChats, setChats } from "@/store/generation";
+import { startProcessingChat, endProcessingChat, updateChats, setChats, setRemainingChats } from "@/store/generation";
 import type { RootState } from "@/store/store";
 import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
@@ -117,6 +117,7 @@ export const useStatusPolling = (uuid: string, setLoading: (e: boolean) => void)
 
             if (data.status && data.status == "inqueue") {
                 console.log("Inqueue lets start polling")
+                dispatch(setRemainingChats(data.remaining_chats || 0))
                 dispatch(startProcessingChat(data.chat_id));
             }
         }
